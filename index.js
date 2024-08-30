@@ -30,17 +30,35 @@ const client = new _Octokit({
 
 const handleRepo = async (org, repo, filename, props) => {
   console.log(`Retrieving repo properties for ${repo.name}`);
-  const { data: _props } = await client.repos.getCustomPropertiesValues({
-    owner: org,
-    repo: repo.name,
-  });
-  //   const { data: _props } = await client.request(
-  //     "GET /repos/{owner}/{repo}/properties/values",
-  //     {
-  //       owner: org,
-  //       repo: repo.name,
-  //     }
-  //   );
+  const promises = [];
+  promises.push(
+    client.repos
+      .getCustomPropertiesValues({
+        owner: org,
+        repo: repo.name,
+      })
+      .then((res) => res.data)
+  );
+  promises.push(
+    client.repos
+      .listTeams({
+        owner: org,
+        repo: repo.name,
+      })
+      .then((res) => res.data)
+  );
+  promises.push(
+    client.repos
+      .listCollaborators({
+        owner: org,
+        repo: repo.name,
+      })
+      .then((res) => res.data)
+  );
+  const [_props, teams, users] = await Promise.all(promises);
+  const adminTeams = teams.filter((t) => t.permission === "admin");
+  const adminUsers = users.filter((u) => u.permissions.admin);
+
   const line = [`"${repo.name}"`];
   line.push(`"${repo.html_url}"`);
   line.push(`"${repo.description}"`);
@@ -53,6 +71,8 @@ const handleRepo = async (org, repo, filename, props) => {
   } else {
     line.push("");
   }
+  line.push(`"${adminTeams.map((t) => t.name).join(",")}"`);
+  line.push(`"${adminUsers.map((u) => u.login).join(",")}"`);
   for (const prop of props) {
     const found = _props.find((p) => p.property_name === prop);
     if (!found) {
@@ -78,6 +98,8 @@ const main = async () => {
     '"is_template"',
     '"forks"',
     '"from_template"',
+    '"admin_teams"',
+    '"admin_users"',
   ];
   for (const prop of props) {
     header.push(`"${prop}"`);
