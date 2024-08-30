@@ -42,6 +42,17 @@ const handleRepo = async (org, repo, filename, props) => {
   //     }
   //   );
   const line = [`"${repo.name}"`];
+  line.push(`"${repo.html_url}"`);
+  line.push(`"${repo.description}"`);
+  line.push(`"${repo.visibility}"`);
+  line.push(`${repo.archived}`);
+  line.push(`${repo.is_template}`);
+  line.push(`${repo.forks_count}`);
+  if (repo.template_repository) {
+    line.push(`"${repo.template_repository.full_name}"`);
+  } else {
+    line.push("");
+  }
   for (const prop of props) {
     const found = _props.find((p) => p.property_name === prop);
     if (!found) {
@@ -58,7 +69,16 @@ const main = async () => {
   const props = process.env.PROPS.split(",");
 
   const filename = process.env.OUTPUT_FILE;
-  const header = ['"repo_name"'];
+  const header = [
+    '"repo_name"',
+    '"url"',
+    '"description"',
+    '"visibility"',
+    '"archived"',
+    '"is_template"',
+    '"forks"',
+    '"from_template"',
+  ];
   for (const prop of props) {
     header.push(`"${prop}"`);
   }
