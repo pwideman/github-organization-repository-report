@@ -1,0 +1,31 @@
+{
+  "name": "github-organization-repository-report",
+  "version": "1.0.0",
+  "description": "Utility to generate a report on an organization's repositories",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "type": "module",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/pwideman/github-organization-repository-report.git"
+  },
+  "keywords": [
+    "GitHub",
+    "Repositories"
+  ],
+  "author": "Paul Wideman",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/pwideman/github-organization-repository-report/issues"
+  },
+  "homepage": "https://github.com/pwideman/github-organization-repository-report#readme",
+  "dependencies": {
+    "@octokit/app": "^15.1.0",
+    "@octokit/plugin-retry": "^7.1.1",
+    "@octokit/plugin-throttling": "^9.3.1",
+    "@octokit/rest": "^21.0.2",
+    "dotenv": "^16.4.5"
+  }
+}
