@@ -114,15 +114,10 @@ const main = async () => {
       await handleRepo(org, repo, filename, props);
     }
   } else {
-    const iterator = octokit.paginate.iterator(octokit.rest.repos.listForOrg, {
+    const iterator = client.paginate.iterator(client.rest.repos.listForOrg, {
       org,
       per_page: 100,
     });
-    // const repos = await client.paginate("GET /orgs/{org}/repos", {
-    //   org: org,
-    //   per_page: 100,
-    // });
-
     for await (const { data: repos } of iterator) {
       for (const repo of repos) {
         await handleRepo(org, repo, filename, props);
