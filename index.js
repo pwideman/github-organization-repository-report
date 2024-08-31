@@ -6,18 +6,18 @@ import fs from "fs";
 
 const _Octokit = Octokit.plugin(retry, throttling);
 const throttle = {
-  onRateLimit: (retryAfter, options, octokit) => {
+  onRateLimit: (retryAfter, options, octokit, retryCount) => {
     octokit.log.warn(
       `Request quota exhausted for request ${options.method} ${options.url}`
     );
-    if (options.request.retryCount === 0) {
+    if (retryCount < 1) {
       octokit.log.info(`Retrying after ${retryAfter} seconds!`);
       return true;
     }
   },
   onSecondaryRateLimit: (retryAfter, options, octokit) => {
     octokit.log.warn(
-      `Abuse detected for request ${options.method} ${options.url}`
+      `SecondaryRateLimit detected for request ${options.method} ${options.url}`
     );
     return true;
   },
