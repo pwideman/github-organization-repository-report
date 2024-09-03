@@ -28,6 +28,13 @@ const client = new _Octokit({
   throttle: throttle,
 });
 
+const escape = (str) => {
+  if (str && str.length > 0) {
+    return str.replace(/"/g, '""');
+  }
+  return str;
+};
+
 const handleRepo = async (org, repo, filename, props) => {
   console.log(`Retrieving repo properties for ${repo.name}`);
   const promises = [];
@@ -59,18 +66,13 @@ const handleRepo = async (org, repo, filename, props) => {
   const adminTeams = teams.filter((t) => t.permission === "admin");
   const adminUsers = users.filter((u) => u.permissions.admin);
 
-  const line = [`"${repo.name}"`];
-  line.push(`"${repo.html_url}"`);
-  line.push(`"${repo.description}"`);
-  line.push(`"${repo.visibility}"`);
-  line.push(`${repo.archived}`);
-  line.push(`${repo.is_template}`);
-  line.push(`${repo.forks_count}`);
-  if (repo.template_repository) {
-    line.push(`"${repo.template_repository.full_name}"`);
-  } else {
-    line.push("");
-  }
+  const line = [`"${escape(repo.name)}"`];
+  line.push(`"${escape(repo.html_url)}"`);
+  line.push(`"${escape(repo.description)}"`);
+  line.push(`"${escape(repo.visibility)}"`);
+  line.push(`${escape(repo.archived)}`);
+  line.push(`${escape(repo.is_template)}`);
+  line.push(`${escape(repo.forks_count)}`);
   line.push(`"${adminTeams.map((t) => t.name).join(",")}"`);
   line.push(`"${adminUsers.map((u) => u.login).join(",")}"`);
   for (const prop of props) {
@@ -78,7 +80,7 @@ const handleRepo = async (org, repo, filename, props) => {
     if (!found) {
       line.push("");
     } else {
-      line.push(`"${found.value}"`);
+      line.push(`"${escape(found.value)}"`);
     }
   }
   await fs.appendFileSync(filename, line.join(",") + "\n");
@@ -97,12 +99,11 @@ const main = async () => {
     '"archived"',
     '"is_template"',
     '"forks"',
-    '"from_template"',
     '"admin_teams"',
     '"admin_users"',
   ];
   for (const prop of props) {
-    header.push(`"${prop}"`);
+    header.push(`"${escape(prop)}"`);
   }
   await fs.writeFileSync(filename, header.join(",") + "\n");
 
